@@ -1,0 +1,46 @@
+/* GameDetailsPage.css */
+.game-details-container {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: #fff; /* Default text color for other elements */
+    padding: 20px;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.7); /* White background with 70% opacity */
+    color: #333; /* Dark text color for the table */
+    border: 1px solid #ddd; /* Optional: Adds a light border to the table */
+    border-radius: 10px; /* Rounded corners for the table */
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    font-weight: bold;
+    background-color: #f4f4f4; /* Optional: Light background for table headers */
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f9f9f9; /* Optional: Alternate row background color */
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1; /* Optional: Highlight row on hover */
+  }
+  
+  .chart-container {
+    margin-top: 20px;
+  }
+  
