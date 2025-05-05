@@ -1,42 +1,53 @@
 import subprocess
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from flask_cors import CORS
-from api.main import run_main
+from flask_mail import Mail, Message
+from api.main import main as update_price_main
 
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///database.db'
+app.config['MAIL_SERVER']="smtp.gmail.com"
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = "maria.pacocha358@gmail.com"
+app.config['MAIL_PASSWORD'] = "jAffos-fovfi8-hokqom"
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 db = SQLAlchemy(app)
 
 class GameResult(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    game_id = db.Column(db.String(255), unique=True)
     title = db.Column(db.String(255))
     description = db.Column(db.String(1000))
     image = db.Column(db.String(1000))
-    price = db.Column(db.Float)
-    shop = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    screenshot = db.Column(db.String(1000))
+    current_price = db.Column(db.Float)
+    regular_price = db.Column(db.Float)
+    url = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.now(ZoneInfo("Europe/Warsaw")))
     search_text = db.Column(db.String(255))
 
     
-    def __init__(self, game_id, title, description, image, price, shop, search_text):
-        self.game_id = game_id
+    def __init__(self, title, description, image, screenshot, current_price, regular_price, url, search_text):
         self.title = title
         self.description = description
         self.image = image
-        self.price = price
-        self.shop = shop
+        self.screenshot = screenshot
+        self.current_price = current_price
+        self.regular_price = regular_price
+        self.url = url
         self.search_text = search_text
 
 
 class TrackedGames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(1000))
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=datetime.now(ZoneInfo("Europe/Warsaw")))
     tracked = db.Column(db.Boolean, default=True)
 
     def __init__(self, name, tracked=True):
@@ -47,18 +58,18 @@ class TrackedGames(db.Model):
 def submit_results():
     result = request.json.get('data')
     search_text = request.json.get("search_text")
-    print(result)
-
 
     game_result = GameResult(
-        game_id=result["game_id"],
-        title=result["title"],
-        description=result["description"],
-        image=result["image"],
-        price=result["current_price"],
-        shop=result["shop"],
-        search_text=search_text,
+    title=result["title"],
+    description=result["description"],
+    image=result["image"],
+    screenshot=result["screenshot"],
+    current_price=result["current_price"],
+    regular_price=result["regular_price"],
+    url=result["ps_store_url"],
+    search_text=search_text,
     )
+
     db.session.add(game_result)
 
     db.session.commit()
@@ -81,19 +92,20 @@ def get_games_results():
 
     game_dict = {}
     for result in results:
-        game_id = result.game_id
-        if game_id not in game_dict:
-            game_dict[game_id] = {
-                'game_id': result.game_id,
+        url = result.url
+        if url not in game_dict:
+            game_dict[url] = {
                 'title': result.title,
                 'description': result.description,
                 'image': result.image,
-                "shop": result.shop,
-                "created_at": result.created_at,
+                'screenshot': result.screenshot,
+                'created_at': result.created_at,
+                'regular_price': result.regular_price,
+                'url' : result.url,
                 'priceHistory': []
             }
-        game_dict[game_id]['priceHistory'].append({
-            'price': result.price,
+        game_dict[url]['priceHistory'].append({
+            'price': result.current_price,
             'date': result.created_at
         })
 
@@ -107,14 +119,15 @@ def get_results():
     game_results = []
     for result in results:
         game_results.append({
-            "game_id": result.game_id,
-            "title": result.title,
+            'title': result.title,
             'description': result.description,
             'image': result.image,
-            "price": result.price,
-            "shop": result.shop,
-            "created_at": result.created_at,
-            "search_text": result.search_text,
+            'screenshot': result.screenshot,
+            'current_price': result.current_price,
+            'regular_price': result.regular_price,
+            'url': result.url,
+            'created_at': result.created_at,
+            'search_text': result.search_text,
         })
 
     return jsonify(game_results)
@@ -125,7 +138,8 @@ def get_game_info():
     
     if not search_text:
         return jsonify({"error": "Missing search_text"}), 400
-    run_main(search_text)
+    
+    update_price_main(search_text, "/results")
 
     response = {'message': 'Game search started successfully'}
     return jsonify(response), 200
@@ -141,10 +155,24 @@ def add_tracked_game():
                 'id': tracked_game.id}
     return jsonify(response), 200
 
+@app.route('/remove-game', methods=['POST'])
+def remove_game():
+    name = request.args.get('name')
+    
+    games = GameResult.query.filter_by(search_text=name).all()
+    
+    if games:
+        for game in games:
+            db.session.delete(game)
+            db.session.commit()
+            return jsonify({'message': 'Game removed successfully', 'id': game.id}), 200
+    else:
+        return jsonify({'error': 'Game not found'}), 404
 
-@app.route('/tracked-game/<int:game_id>', methods=['PUT'])
-def toggle_tracked_game(game_id):
-    tracked_game = TrackedGames.query.get(game_id)
+
+@app.route('/tracked-game/<int:url>', methods=['PUT'])
+def toggle_tracked_game(url):
+    tracked_game = TrackedGames.query.get(url)
     if tracked_game is None:
         response = {'message': 'Tracked game not found'}
         return jsonify(response), 404
@@ -165,8 +193,6 @@ def get_tracked_games():
         results.append({
             'id': game.id,
             'title': game.name,
-            'description': game.description,
-            'image': game.image,
             'created_at': game.created_at,
             'tracked': game.tracked
         })
@@ -180,16 +206,45 @@ def update_tracked_games():
 
     game_names = []
     for tracked_game in tracked_games:
+        print(f"Checking: {tracked_game.name} (tracked={tracked_game.tracked})")
+
         name = tracked_game.name
         if not tracked_game.tracked:
             continue
 
-        run_main(name)
+        update_price_main(name, "/results")
+
+        #if price_dropped(tracked_game):
+            #send_email(tracked_game)
+
         game_names.append(name)
 
-    response = {'message': 'Api request started successfully',
+    response = {'message': 'Tracked games updated successfully',
                 "games": game_names}
     return jsonify(response), 200
+
+def price_dropped(game_result):
+    price_history = GameResult.query.get(game_result.name).priceHistory
+    if len(price_history) < 2:
+        return False
+    
+    current_price = price_history[-1]['current_price']
+    previous_price = price_history[-2]['current_price']
+    
+    return current_price < previous_price
+
+@app.route("/send_mail")
+def send_email(game):
+    name = game.name
+    price = request.json.get('price')
+    mail_message = Message(f'Great news! {name} is on discount!',
+            sender =   'maria.pacocha358@gmail.com',
+            recipients = ['maria.jalocha358@gmail.com'])
+    mail_message.body = f'🎮 Great news! The price of {name} in PS Store just dropped to {price} zł and it is currently on discount! Do not miss the deal ;).', 
+            
+    mail.send(mail_message)
+    return "Mail has been sent"
+
 
 
 if __name__ == '__main__':

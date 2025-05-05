@@ -4,74 +4,35 @@ import re
 import unicodedata
 from requests import post
 import requests
-
-API_KEY = "887af83d2bfe0d0cd2043aada1c272476ae8c2ce"
-API_KEY_RAWG = "12d9cf8f35cf4fe7a4a4b2275d7b9863"
-
-url_info = "https://api.rawg.io/api/games/anno-1800?key="
-url_photo = "https://api.rawg.io/api/games/anno-1800/screenshots?key="
-
-def get_search_all(name):
-    url = f"https://api.isthereanydeal.com/games/search/v1?key={API_KEY}&title={name}"
+from bs4 import BeautifulSoup
 
 
-def string_to_slug(title):
-    title = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("utf-8")
-    title = re.sub(r"[^\w\s-]", "", title).strip().lower()
-    slug = re.sub(r"[-\s]+", "-", title)
-    return slug
+API_KEY_PLAT_PRICES = "%20F62pWUvUQCGZg1B3G1Gg6Bhf3FvTKy10"
+URL = f"https://platprices.com/api.php?key=%20F62pWUvUQCGZg1B3G1Gg6Bhf3FvTKy1010&name=it%20takes%20two&region=Pl"
 
-def get_game_id(game_name):
-    slug = string_to_slug(game_name)
-    url = f"https://api.isthereanydeal.com/games/lookup/v1?key={API_KEY}&title={slug}"
+def clean_description(html_desc):
+    if not html_desc:
+        return ""
+    soup = BeautifulSoup(html_desc, "html.parser")
+    return soup.get_text(separator="\n") 
+
+def get_game(name):
+    url = f"https://platprices.com/api.php?key={API_KEY_PLAT_PRICES}&name={name}&region=Pl"
     response = requests.get(url)
     data = response.json()
 
-    if data:
-        game_id = data['game']['id']
-        return game_id
-    return None
-
-def get_game_description(name):
-    slug = string_to_slug(name)
-    rawgResponse = requests.get(f"https://api.rawg.io/api/games/{slug}?key={API_KEY_RAWG}")
-    data = rawgResponse.json()
-    return data.get("description", "No description available.")
-
-def get_game_image(name):
-    slug = string_to_slug(name)
-    rawgResponse = requests.get(f"https://api.rawg.io/api/games/{slug}/screenshots?key={API_KEY_RAWG}")
-    data = rawgResponse.json()
-    if "results" in data and data["results"]:
-        return data["results"][0].get("image", "No image available.")
-    return "No screenshots available."
-
-
-def get_game(name):
-    url = f"https://api.isthereanydeal.com/games/overview/v2?key={API_KEY}"
-    game_id = get_game_id(name)
-    if not game_id:
-        print(f"Game '{name}' not found.")
-        return None
-    data = [game_id]
-    params = {
-        "country": "PL" 
+    return {
+        "title": data.get("GameName"),
+        "game_id": data.get("GameID"),
+        "current_price": data.get("SalePrice"),
+        "regular_price": data.get("BasePrice"),
+        "discounted_until": data.get("DiscountedUntil"),
+        "description": clean_description(data.get("Desc")),
+        "image": data.get("Img"),
+        "screenshot": data.get("Screenshot1"),
+        "ps_store_url": data.get("PSStoreURL")
     }
-    response = requests.post(url, json=data, params=params)
-    data = response.json()
-    prices = data.get("prices", [])
-    if not prices:
-        print(f"No price data available for '{name}'.")
-        return None
-    current_price = prices[0]["current"]["price"]["amount"]
-    regular_price = prices[0]["current"]["regular"]["amount"]
-    currency = prices[0]["current"]["price"]["currency"] 
-    shop = prices[0]["current"]["shop"]["name"]
-    description = get_game_description(name)
-    image = get_game_image(name)
-    
-    return {"title": name,"game_id": game_id, "current_price": current_price, "currency": currency, 
-    "regular_price": regular_price, "shop": shop, "description": description, "image": image}
+
 
 def save_results(results):
     data = {"results": results}
@@ -91,13 +52,18 @@ def post_results(results, search_text, endpoint):
                     headers=headers, json=data)
     print("Status code:", response.status_code)
 
-def run_main(search_text, response_route="/results"):
+
+def main(search_text, response_route):
+    print(f"Running main() for {search_text}") 
+
     results = get_game(search_text)
+
     if not results:
         print(f"No data found for '{search_text}', skipping request.")
         return
     
+    save_results(results)
     print("Saving results.")
+
     post_results(results, search_text, response_route)
 
-print(get_game("the-witcher-3-wild-hunt"))
