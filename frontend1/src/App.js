@@ -4,13 +4,7 @@ import PriceHistoryTable from "./components/PriceHistoryTable";
 import TrackedGamesList from "./components/TrackedGamesList";
 import axios from "axios";
 import "./App.css";
-import {
-  Button,
-  Form,
-  ListGroup,
-  ListGroupItem,
-  FormCheck,
-} from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 const URL = "http://127.0.0.1:5000";
 
@@ -20,42 +14,25 @@ function App() {
   const [searchedGames, setSearchedGames] = useState([]);
   const [searchTexts, setSearchTexts] = useState([]);
   const [newSearchText, setNewSearchText] = useState("");
-  
 
   useEffect(() => {
-    const savedSearchTexts = localStorage.getItem("searchTexts");
-    const savedSearchedGames = localStorage.getItem("searchedGames");
-    
-
-    if (savedSearchTexts) {
-      setSearchTexts(JSON.parse(savedSearchTexts));
-      setSearchedGames(JSON.parse(savedSearchedGames));
-    } else {
-      fetchUniqueSearchTexts();
-      fetchSearchedGames();
-    }
+    fetchUniqueSearchTexts();
+    fetchSearchedGames();
   }, []);
 
   const fetchUniqueSearchTexts = async () => {
     try {
       const response = await axios.get(`${URL}/unique_search_texts`);
-      const data = response.data;
-
-      localStorage.setItem("searchTexts", JSON.stringify(data));
-
-      setSearchTexts(data);
+      setSearchTexts(response.data);
     } catch (error) {
       console.error("Error fetching unique search texts:", error);
     }
   };
+
   const fetchSearchedGames = async () => {
     try {
       const response = await axios.get(`${URL}/all-results`);
-      const data = response.data;
-
-      localStorage.setItem("searchedGames", JSON.stringify(data));
-
-      setSearchedGames(data);
+      setSearchedGames(response.data);
     } catch (error) {
       console.error("Error fetching all searched games:", error);
     }
@@ -66,9 +43,7 @@ function App() {
       const response = await axios.get(
         `${URL}/results?search_text=${searchText}`
       );
-
-      const data = response.data;
-      setPriceHistory(data);
+      setPriceHistory(response.data);
       setShowPriceHistory(true);
     } catch (error) {
       console.error("Error fetching price history:", error);
@@ -92,11 +67,8 @@ function App() {
         search_text: newSearchText,
       });
 
-      const updatedSearchTexts = [...searchTexts, newSearchText];
-      setSearchTexts(updatedSearchTexts);
-      fetchSearchedGames();
-
-      localStorage.setItem("searchTexts", JSON.stringify(updatedSearchTexts));
+      await fetchUniqueSearchTexts();
+      await fetchSearchedGames();
 
       setNewSearchText("");
     } catch (error) {
@@ -107,14 +79,12 @@ function App() {
 
   const handleRemoveSearchText = async (searchTextToRemove) => {
     try {
-      await axios.post(`${URL}/remove-game?name=${encodeURIComponent(searchTextToRemove)}`);
-
-      const updatedSearchTexts = searchTexts.filter(
-        (searchText) => searchText !== searchTextToRemove
+      await axios.post(
+        `${URL}/remove-game?name=${encodeURIComponent(searchTextToRemove)}`
       );
 
-      setSearchTexts(updatedSearchTexts);
-      localStorage.setItem("searchTexts", JSON.stringify(updatedSearchTexts));
+      await fetchUniqueSearchTexts();
+      await fetchSearchedGames();
     } catch (error) {
       console.error("Error removing game from searched:", error);
     }
@@ -138,23 +108,24 @@ function App() {
           style={{ width: "500px" }}
         />
         <div style={{ width: "20px" }} />
-
         <Button onClick={handleNewSearchTextSubmit}>Search</Button>
       </div>
+
       <SearchTextList
         games={searchedGames}
         searchTexts={searchTexts}
         onSearchTextClick={handleSearchTextClick}
         onRemoveTextClick={handleRemoveSearchText}
       />
+
       {showPriceHistory && (
         <PriceHistoryTable
           priceHistory={priceHistory}
           onClose={handlePriceHistoryClose}
         />
       )}
+
       <TrackedGamesList games={searchedGames} searchTexts={searchTexts} />
-      
     </div>
   );
 }

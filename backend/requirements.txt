@@ -3,3 +3,6 @@ Flask
 Flask-SQLAlchemy
 Flask-Cors
 playwright
+bs4
+flask_mail
+dotenv
