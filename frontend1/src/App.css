@@ -4,41 +4,61 @@
 body {
   background-image: url('https://wallpapercave.com/wp/wp12670893.jpg');
   background-size: contain;
-  background-repeat: repeat;
   background-position: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+code {
+  font-family: Avant Garde,Avantgarde,Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+h3 {font-family: 'Common Pixel', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: white !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+h2 {font-family: "Jersey 10 Charted", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: large;
+  color: white !important;
 }
 
-.App-link {
-  color: #61dafb;
+h1 {
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  color: white !important;
+  margin-top: 70px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.transparent-input {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #E5E2CF;
+  border: 1px solid #570F07;
+  font-family: 'IBM Plex Mono', monospace;
 }
+
+.btn-quartz-dark {
+  background-color: #1a1a1a;
+  border: 0.1px solid #570F07;
+  color: #E5E2CF;
+  font-weight: bold;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-quartz-dark:hover,
+.btn-quartz-dark:focus {
+  background-color: #330000; /* a dark red shade instead of blue */
+  border-color: #a0201f; /* slightly lighter red for border */
+  color: #fff; /* optional: brighter text on hover */
+  outline: none; /* removes default blue outline */
+}
+
+.PriceHistoryTable {
+  margin-top: 1px; /* reduce this value or set to 0 */
+}
+.SearchTextList {
+  margin-bottom: 10px; /* reduce this value if needed */
+}
+

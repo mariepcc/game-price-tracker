@@ -3,7 +3,7 @@ import axios from "axios";
 import ModalComponent from "./Modal";
 import GameDetailsPage from "./GameDetailsPage";
 import Table from "react-bootstrap/Table";
-
+import "../styles/TrackedGamesList.css"; // Assuming you have a CSS file for custom styles
 function PriceHistoryTable({ priceHistory, onClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
@@ -29,25 +29,10 @@ function PriceHistoryTable({ priceHistory, onClose }) {
     return Math.round(change * 100) / 100;
   };
 
-  const sendEmail = (product) => {
-    if (getPriceChange(product) > 0) {
-      try {
-        const data = {
-          name: product.title,
-          price: product.currentPrice,
-          date: product.d,
-        };
-        axios.post("/send-email", data);
-      } catch (error) {
-        console.error("Error sending price change email:", error);
-      }
-    }
-  };
-
   return (
     <div>
       <center>
-        <h2>Price History</h2>
+        <h3>Price History</h3>
       </center>
       {priceHistory.map((product) => {
         const priceData = getPriceData(product);
@@ -55,37 +40,43 @@ function PriceHistoryTable({ priceHistory, onClose }) {
 
         return (
           <Table
-            striped
             key={product.id}
             size="sm"
+            className="table"
             style={{ maxWidth: "600px", margin: "auto" }}
           >
-            <tr>
-              <th>Updated At</th>
-              <td>{priceData.date}</td>
-            </tr>
-            <tr>
-              <th>Name</th>
-              <td>
-                <a onClick={() => openModal(product)}>{product.title}</a>
-              </td>
-            </tr>
-            <tr>
-              <th>Price</th>
-              <td>{priceData.price / 100} zł</td>
-            </tr>
-            <tr>
-              <th>Price Change</th>
-              <td style={{ color: change > 0 ? "red" : "green" }}>
-                {change >= 0 && "+"}
-                {change}%
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <th>Updated At</th>
+                <td>{priceData.date}</td>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <td>
+                  <a onClick={() => openModal(product)}>{product.title}</a>
+                </td>
+              </tr>
+              <tr>
+                <th>Price</th>
+                <td>{priceData.price / 100} zł</td>
+              </tr>
+              <tr>
+                <th>Price Change</th>
+                <td style={{ color: change > 0 ? "red" : "green" }}>
+                  {change >= 0 && "+"}
+                  {change}%
+                </td>
+              </tr>
+            </tbody>
           </Table>
         );
       })}
 
-      <button onClick={onClose}>Close</button>
+      <center>
+        <button className="btn-quartz-dark close-btn" onClick={onClose}>
+          Close
+        </button>
+      </center>
       <ModalComponent
         isOpen={isModalOpen}
         closeModal={closeModal}

@@ -63,3 +63,5 @@ def main(search_text, response_route):
     print("Saving results.")
 
     post_results(results, search_text, response_route)
+
+    return results

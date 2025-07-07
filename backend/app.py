@@ -170,10 +170,9 @@ def get_game_info():
     if not search_text:
         return jsonify({"error": "Missing search_text"}), 400
 
-    update_price_main(search_text, "/results")
+    game_data = update_price_main(search_text, "/results")
 
-    response = {"message": "Game search started successfully"}
-    return jsonify(response), 200
+    return jsonify(game_data), 200
 
 
 @app.route("/add-tracked-game", methods=["POST"])

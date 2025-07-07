@@ -1,8 +1,9 @@
 import React from "react";
 import Slider from "react-slick";
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { ReactComponent as MyIcon } from "../icons/trash-bin-remove-svgrepo-com.svg";
 
 function SearchTextList({
   games,
@@ -10,15 +11,6 @@ function SearchTextList({
   onSearchTextClick,
   onRemoveTextClick,
 }) {
-  const getImageForSearchText = (searchText) => {
-    const match = games
-      .filter((game) => game && typeof game.title === "string" && game.title)
-      .find((game) =>
-        game.title.toLowerCase().includes(searchText.toLowerCase())
-      );
-    return match?.image || "/Users/marysiapacocha/Downloads/IMG_9201.PNG";
-  };
-
   const settings = {
     className: "center",
     infinite: true,
@@ -31,30 +23,45 @@ function SearchTextList({
     },
   };
 
+  const getImageForSearchText = (searchText) => {
+    const match = games
+      .filter((game) => game && typeof game.title === "string" && game.title)
+      .find((game) =>
+        game.title.toLowerCase().includes(searchText.toLowerCase())
+      );
+    return match?.image || match?.screenshot;
+  };
+
   return (
     <div className="content">
-      <h1 className="header">All searched games:</h1>
+      <h3 className="header">All searched games:</h3>
       <div className="container">
         <Slider {...settings}>
           {searchTexts.map((searchText) => (
-            <div key={searchText}>
-              <div className="img-body">
-                <img
+            <div key={searchText} className="search-card">
+              <Card className="game-card">
+                <Card.Img
+                  variant="top"
+                  className="card-img"
                   src={getImageForSearchText(searchText)}
                   alt={searchText}
                   onClick={() => onSearchTextClick(searchText)}
                 />
-              </div>
-              <div>
-                <h2>{searchText}</h2>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={() => onRemoveTextClick(searchText)}
+                <Card.Body
+                  className="card-body"
+                  style={{ backgroundColor: "black" }}
                 >
-                  Remove
-                </Button>
-              </div>
+                  <h3>{searchText}</h3>
+                  <Button
+                    size="sm"
+                    variant="light"
+                    className="icon-button"
+                    onClick={() => onRemoveTextClick(searchText)}
+                  >
+                    <MyIcon style={{ width: "18px", height: "16px" }} />
+                  </Button>
+                </Card.Body>
+              </Card>
             </div>
           ))}
         </Slider>

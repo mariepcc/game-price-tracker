@@ -1,0 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap");
+
+body {
+  background-color: #21222C;
+  color: #E5E2CF;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+h1, h2 {
+  color: #FF6969;
+  font-weight: 700;
+}
+
+.custom-panel {
+  background-color: #21222C;
+  border: 1px solid #570F07;
+  border-radius: 0;
+  color: #E5E2CF;
+}
+
+.custom-list .list-group-item {
+  background-color: #21222C;
+  border: 1px solid #570F07;
+  color: #E5E2CF;
+}
+
+.table {
+  background-color: #21222C;
+  color: #E5E2CF;
+  border: 1px solid #570F07;
+  border-radius: 10 !important;
+}
+
+
+
+a {
+  color: #FF6969;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.form-check-label {
+  color: #919384;
+}
+
+.btn-danger {
+  background-color: #DF3C4F;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c53142;
+}
+
+.btn {
+  margin-left: 0.5rem;
+  color: #fff;
+}
+
+/* Apply styles to table header cells */
+.table th {
+  background-color: #21222C !important;
+  color: #FF6969 !important;
+  font-weight: bold;
+  border: 1px solid #570F07 !important;
+}
+
+/* Apply styles to table body cells */
+.table td {
+  background-color: #21222C !important;
+  color: #E5E2CF !important;
+  border: 1px solid #570F07 !important;
+}
+
+/* Links in table */
+.table a {
+  color: #FF6969;
+}
+
+.table a:hover {
+  text-decoration: underline;
+}
+
+/* Optional: Row hover effect */
+.table tr:hover {
+  background-color: #2b2c36 !important;
+}
+

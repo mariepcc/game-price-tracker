@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import SearchTextList from "./components/SearchTextList";
 import PriceHistoryTable from "./components/PriceHistoryTable";
 import TrackedGamesList from "./components/TrackedGamesList";
+import { ToastContainer, toast } from "react-toastify";
+import { Button, Form } from "react-bootstrap";
 import axios from "axios";
 import "./App.css";
-import { Button, Form } from "react-bootstrap";
 
 const URL = "http://127.0.0.1:5000";
 
@@ -63,17 +64,43 @@ function App() {
     event.preventDefault();
 
     try {
-      await axios.post(`${URL}/get-game`, {
+      const response = await axios.post(`${URL}/get-game`, {
         search_text: newSearchText,
       });
 
-      await fetchUniqueSearchTexts();
-      await fetchSearchedGames();
+      const newGame = response.data;
+      console.log("New game data:", response);
 
+      if (!newSearchText.trim()) {
+        toast.warning("Please enter a valid game name.");
+        return;
+      }
+
+      if (!newGame || !newGame.ps_store_url) {
+        handleRemoveSearchText(newSearchText);
+        toast.warning("Game not found.");
+        return;
+      }
+
+      const alreadyExists = searchedGames.some(
+        (game) => game.url === newGame.ps_store_url
+      );
+
+      if (alreadyExists) {
+        toast.warning("This game is already on your list.");
+        handleRemoveSearchText(newSearchText);
+        return;
+      }
+
+      const updatedSearchTexts = [...searchTexts, newSearchText];
+      setSearchTexts(updatedSearchTexts);
       setNewSearchText("");
+
+      await fetchSearchedGames();
+      await fetchUniqueSearchTexts();
     } catch (error) {
       console.error("Error details:", error.response || error.message || error);
-      alert("Error sending request:", error);
+      toast.error("Error sending request.");
     }
   };
 
@@ -103,12 +130,29 @@ function App() {
           type="text"
           value={newSearchText}
           onChange={handleNewSearchTextChange}
-          placeholder="Search for a new game..."
-          className="mr-2"
-          style={{ width: "500px" }}
+          style={{
+            width: "500px",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            color: "#E5E2CF",
+            border: "1px solid #570F07",
+            fontFamily: "'IBM Plex Mono', monospace",
+            marginBottom: "50px",
+          }}
         />
-        <div style={{ width: "20px" }} />
-        <Button onClick={handleNewSearchTextSubmit}>Search</Button>
+
+        <Button
+          style={{
+            backgroundColor: "#1a1a1a",
+            border: "0.1px solid #570F07",
+            color: "#E5E2CF",
+            fontWeight: "bold",
+            transition: "background-color 0.3s ease, border-color 0.3s ease",
+            marginBottom: "50px",
+          }}
+          onClick={handleNewSearchTextSubmit}
+        >
+          Search
+        </Button>
       </div>
 
       <SearchTextList
@@ -116,16 +160,19 @@ function App() {
         searchTexts={searchTexts}
         onSearchTextClick={handleSearchTextClick}
         onRemoveTextClick={handleRemoveSearchText}
+        className="SearchTextList"
       />
 
       {showPriceHistory && (
         <PriceHistoryTable
+          className="PriceHistoryTable"
           priceHistory={priceHistory}
           onClose={handlePriceHistoryClose}
         />
       )}
 
       <TrackedGamesList games={searchedGames} searchTexts={searchTexts} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

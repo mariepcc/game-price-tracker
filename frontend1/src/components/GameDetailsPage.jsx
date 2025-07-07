@@ -5,7 +5,7 @@ import "../styles/GameDetailsPage.css";
 const GameDetailsPage = ({ product }) => {
   const {
     title,
-    description, 
+    description,
     image,
     screenshot,
     regular_price,
@@ -42,7 +42,7 @@ const GameDetailsPage = ({ product }) => {
     .map((history) => formatDate(new Date(history.date)))
     .reverse();
   const prices = priceHistory.map((history) => history.price / 100).reverse();
-  console.log(prices)
+  console.log(prices);
 
   const chartData = {
     options: {
@@ -62,10 +62,12 @@ const GameDetailsPage = ({ product }) => {
   };
 
   return (
-    <div className="game-details-container"
-    style={{
-      backgroundImage: `url(${screenshot})`,
-    }}>
+    <div
+      className="game-details-container"
+      style={{
+        backgroundImage: `url(${screenshot})`,
+      }}
+    >
       <h2 className="game-title">{title}</h2>
       <table>
         <thead>
@@ -98,12 +100,12 @@ const GameDetailsPage = ({ product }) => {
         </tbody>
       </table>
       <div className="chart-container">
-      <ApexCharts
-        options={chartData.options}
-        series={chartData.series}
-        type="line"
-        height={300}
-      />
+        <ApexCharts
+          options={chartData.options}
+          series={chartData.series}
+          type="line"
+          height={300}
+        />
       </div>
     </div>
   );

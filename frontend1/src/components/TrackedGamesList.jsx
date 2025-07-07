@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -10,10 +12,15 @@ import {
 import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
+import "../styles/TrackedGamesList.css";
 
 const TrackedGamesList = ({ games, searchTexts }) => {
   const [trackedGames, setTrackedGames] = useState([]);
   const [selected, setSelected] = useState([]);
+
+  useEffect(() => {
+    fetchTrackedGames();
+  }, []);
 
   const fetchTrackedGames = async () => {
     try {
@@ -23,10 +30,6 @@ const TrackedGamesList = ({ games, searchTexts }) => {
       console.error("Error fetching tracked games:", error);
     }
   };
-
-  useEffect(() => {
-    fetchTrackedGames();
-  }, []);
 
   const trackedGameTitles = trackedGames.map((game) => game.title);
 
@@ -43,8 +46,8 @@ const TrackedGamesList = ({ games, searchTexts }) => {
 
   const handleAddTrackedGame = async () => {
     if (selected.length === 0) return;
-
     const selectedGame = selected[0];
+
     try {
       await axios.post("http://127.0.0.1:5000/add-tracked-game", {
         name: selectedGame,
@@ -77,7 +80,7 @@ const TrackedGamesList = ({ games, searchTexts }) => {
   };
 
   return (
-    <div className="container mt-5">
+    <div>
       <center>
         <h1 className="mb-4">Add Tracked Game</h1>
       </center>
@@ -89,18 +92,25 @@ const TrackedGamesList = ({ games, searchTexts }) => {
           placeholder="Choose a game..."
           selected={selected}
         />
-        <Button onClick={handleAddTrackedGame} className="ml-2">
+        <Button
+          onClick={handleAddTrackedGame}
+          style={{
+            backgroundColor: "#1a1a1a",
+            border: "0.1px solid #570F07",
+            color: "#E5E2CF",
+            fontWeight: "bold",
+            transition: "background-color 0.3s ease, border-color 0.3s ease",
+          }}
+        >
           Add
         </Button>
       </div>
-      <div
-        className="container mt-5"
-        style={{ maxWidth: "600px", margin: "0 auto" }}
-      >
+
+      <div className="container mt-5" style={{ maxWidth: "600px" }}>
         <center>
           <h1 className="mb-3">Tracked Games:</h1>
         </center>
-        <ListGroup>
+        <ListGroup className="custom-list">
           {trackedGames.map((game) => (
             <ListGroupItem
               key={game.id}

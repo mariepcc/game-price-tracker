@@ -2,14 +2,11 @@ code {
   font-family: Avant Garde,Avantgarde,Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
 }
 
-body {
-  background-color: #1a1a1a;
-}
-
 h3 {font-family: 'Common Pixel', sans-serif;
   font-weight: 400;
   font-style: normal;
   color: white !important;
+  padding-top: 20px;
 }
 
 h2 {font-family: "Jersey 10 Charted", sans-serif;
@@ -24,28 +21,93 @@ h1 {
   font-optical-sizing: auto;
   font-style: normal;
   color: white !important;
+  margin-top: 70px;
+}
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;    
+  height: 100vh;  
 
-  
+}
+.price-history-wrapper {
+  margin-top: 1px; 
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.price-history-wrapper table {
+  margin-bottom: 0.1px;
+}
+
+.custom-table {
+  border-radius: 10px;
+  overflow: hidden; 
+}
+
+
+
+.game-card {
+  width: 250px;
+  min-height: 200px;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  border: none !important;
+   overflow: hidden;
+
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-img {
+  width: 100%; 
+  height: 300px; 
+  object-fit: cover; 
+  display: block;
+
+}
+
+
+.icon-button {
+  position: absolute; 
+  right: 3px; 
+  bottom: 1%; 
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: border-color 0.25s;
+  padding: 5px;
 }
-button:hover {
-  border-color: #646cff;
+
+.icon-button svg {
+  width: 15px;
+  height: 20px;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+.icon-button-delete {
+  width: 40px;  
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
 }
+
+.icon-button-delete svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  height: 150px; 
+  text-align: center; 
+  overflow: hidden;
+}
+
+
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -68,21 +130,7 @@ button:focus-visible {
   font-size: 30px;
 }
 
-.img-body {
-  width: 250px;
-  margin: 0 20px; 
-  display: inline-block;
-  vertical-align: top;
-}
 
-.img-body img {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 12px; 
-}
 
 .img-body img:hover {
   transform: scale(1.05);
@@ -93,33 +141,59 @@ button:focus-visible {
   margin: 0 auto;
   width: 100%;
   height: 80vh;
-  border-color: white;
+    background-color: transparent;
+
 }
 
 .slick-slide {
   padding: 30px; 
   box-sizing: border-box;
+    background-color: transparent;
+
 }
 
 .slick-prev,
 .slick-next {
-  position: absolute; /* Not relative or fixed! */
+  position: absolute; 
   top: 50%;
   transform: translateY(60%);
   z-index: 2;
 }
 
 .slick-prev {
-  left: -40px; /* Adjust if needed */
+  left: -40px; 
 }
 
 .slick-next {
-  right: -40px; /* Adjust if needed */
+  right: -40px; 
 }
 
 .slick-prev:before,
 .slick-next:before {
   font-size: 30px;
   color: black;
+}
+
+.search-card {
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
+.btn-quartz-dark {
+  background-color: #1a1a1a;
+  border: 0.1px solid #570F07;
+  color: #E5E2CF;
+  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.close-btn {
+  margin-top: 30px;
+  margin-bottom: 50px; 
+  display: block;
 }
 
